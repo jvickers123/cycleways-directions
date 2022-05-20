@@ -1,4 +1,4 @@
-import React, {useState, useRef } from 'react'
+import React, {useState, useEffect, useRef } from 'react'
 
 // MAPBOX
 import ReactMapGl from 'react-map-gl'
@@ -28,9 +28,15 @@ const Map = ({ originalRoute }) => {
 
   // takes route data
   // convert to geojson data
-  const backwards = polyline.decode(originalRoute)
-  const ogRoute = backwards.map(coords => coords.reverse())
-  console.log(ogRoute)
+  useEffect(() => {
+    if (originalRoute) {
+      const backwards = polyline.decode(originalRoute)
+      const ogRoute = backwards.map(coords => coords.reverse())
+      console.log(ogRoute)
+    }
+    
+  }, [originalRoute])
+  
   // select TFL routes on route
   // buffer them
   // find where intersects
