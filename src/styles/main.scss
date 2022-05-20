@@ -1,4 +1,5 @@
-.map-container {
-  height: 400px;
-  width: 300px;
-}
+@import './variables.scss';
+
+// COMPONENTS
+@import './components/map.scss';
+
