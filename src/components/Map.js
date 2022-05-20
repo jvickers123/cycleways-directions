@@ -66,9 +66,14 @@ const Map = ({ originalRoute, startPoint, endPoint }) => {
         if (!closest.length) {
           closest.push(arr)
         }
-        else if (arr[1] < closest[0][1]) {
-          closest.pop()
-          closest.push(arr)
+        else {
+          const index = closest.findIndex(item => item[0] === arr[0])
+          if (index === -1) {
+            closest.push(arr)
+          }
+          else if (arr[1] < closest[index][1]) {
+            closest[index] = arr
+          }
         }
       })
       const closestEnd = []
@@ -78,9 +83,14 @@ const Map = ({ originalRoute, startPoint, endPoint }) => {
         if (!closestEnd.length) {
           closestEnd.push(arr)
         }
-        else if (arr[1] < closestEnd[0][1]) {
-          closestEnd.pop()
-          closestEnd.push(arr)
+        else {
+          const index = closestEnd.findIndex(item => item[0] === arr[0])
+          if (index === -1) {
+            closestEnd.push(arr)
+          }
+          else if (arr[1] < closestEnd[index][1]) {
+            closestEnd[index] = arr
+          }
         }
       })
       console.log(distances, closest, distanceEnd, closestEnd)
