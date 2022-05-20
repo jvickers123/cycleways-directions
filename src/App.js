@@ -1,12 +1,10 @@
 import React from 'react'
 
 // COMPONENTS
-import Map from './components/Map';
+import Map from './components/Map'
 
-function App() {
-  return (
+const App = () => (
     <Map />
-  )
-}
+)
 
-export default App;
+export default App
