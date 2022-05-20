@@ -6569,6 +6569,11 @@ pkg-up@^3.1.0:
   dependencies:
     find-up "^3.0.0"
 
+polyline@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/polyline/-/polyline-0.2.0.tgz#4f2b716ca81134a6cbaa488975d236ecb1cc2840"
+  integrity sha1-TytxbKgRNKbLqkiJddI27LHMKEA=
+
 postcss-attribute-case-insensitive@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/postcss-attribute-case-insensitive/-/postcss-attribute-case-insensitive-5.0.0.tgz#39cbf6babf3ded1e4abf37d09d6eda21c644105c"

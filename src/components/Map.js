@@ -1,15 +1,19 @@
-import React, {useState, useRef } from "react"
+import React, {useState, useRef } from 'react'
 
 // MAPBOX
-import ReactMapGl, { Source, Layer, Marker } from 'react-map-gl'
+import ReactMapGl from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import mapboxgl from 'mapbox-gl'
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker'
+
+// IMPORTS
+import polyline from 'polyline'
+// import { decode } from 'geojson-polyline'
+
 mapboxgl.workerClass = MapboxWorker
 
-
-const Map = () => {
+const Map = ({ originalRoute }) => {
 
   // STATE
   const [viewPort, setViewPort] = useState({
@@ -20,6 +24,22 @@ const Map = () => {
 
   // REF
   const mapRef = useRef()
+
+
+  // takes route data
+  // convert to geojson data
+  const backwards = polyline.decode(originalRoute)
+  const ogRoute = backwards.map(coords => coords.reverse())
+  console.log(ogRoute)
+  // select TFL routes on route
+  // buffer them
+  // find where intersects
+  // filter intersects by which one's actually used
+  // display data
+
+  // research directions from markers
+  // set reduced directions
+
 
   return (
     <div className='map-container'>
