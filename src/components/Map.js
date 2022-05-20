@@ -7,13 +7,22 @@ import mapboxgl from 'mapbox-gl'
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker'
 
-// IMPORTS
+// TURF
 import polyline from 'polyline'
-// import { decode } from 'geojson-polyline'
+import linestring from 'turf-linestring'
+import bbox from '@turf/bbox'
+import { polygonToLine } from '@turf/polygon-to-line'
+import buffer from '@turf/buffer'
+import lineIntersect from '@turf/line-intersect'
+import distance from '@turf/distance'
+
+// DATA
+import data from '../data/CycleRoutes.json'
+
 
 mapboxgl.workerClass = MapboxWorker
 
-const Map = ({ originalRoute }) => {
+const Map = ({ originalRoute, startPoint, endPoint }) => {
 
   // STATE
   const [viewPort, setViewPort] = useState({
@@ -25,23 +34,62 @@ const Map = ({ originalRoute }) => {
   // REF
   const mapRef = useRef()
 
-
-  // takes route data
-  // convert to geojson data
   useEffect(() => {
     if (originalRoute) {
+      // decode route to geojson linstring
       const backwards = polyline.decode(originalRoute)
       const ogRoute = backwards.map(coords => coords.reverse())
-      console.log(ogRoute)
+      const OGRouteLine = linestring(ogRoute)
+
+      // select TFL routes on route
+      const routeBbox = bbox(OGRouteLine)
+      const bboxEdge1 = mapRef.current.project([routeBbox[0], routeBbox[1]])
+      const bboxEdge2 = mapRef.current.project([routeBbox[2], routeBbox[3]])
+      const cyclewaysInsideBbox = mapRef.current.queryRenderedFeatures([[bboxEdge1.x, bboxEdge1.y], [bboxEdge2.x, bboxEdge2.y]], { layers: ['cycleroutes'] })
+      const routeIDs = new Set(cyclewaysInsideBbox.map(route => route.properties.OBJECTID))
+      const TFLRoutes = data.features.filter(feature => routeIDs.has(feature.properties.OBJECTID))
+      console.log(TFLRoutes)
+      
+      // buffer tfl routes
+      const bufferedTFL = TFLRoutes.map(geoJSONFile => polygonToLine(buffer(geoJSONFile, 0.02), {properties: geoJSONFile.properties}))
+      
+      // find where route intersects with buffer
+      const intersects = bufferedTFL.map(shape => [shape.properties.OBJECTID, lineIntersect(shape, OGRouteLine)])
+      const filteredIntersects = intersects.filter(marker => marker[1].features.length)
+      console.log(filteredIntersects)
+
+      // filter intersects by which one's actually used
+      const distances = []
+      filteredIntersects.forEach(item => item[1].features.forEach(feature => distances.push([item[0], distance(startPoint, feature.geometry.coordinates)])))
+      const closest = []
+      distances.forEach(arr => {
+        if (!closest.length) {
+          closest.push(arr)
+        }
+        else if (arr[1] < closest[0][1]) {
+          closest.pop()
+          closest.push(arr)
+        }
+      })
+      const closestEnd = []
+      const distanceEnd = []
+      filteredIntersects.forEach(item => item[1].features.forEach(feature => distanceEnd.push([item[0], distance(endPoint, feature.geometry.coordinates)])))
+      distanceEnd.forEach(arr => {
+        if (!closestEnd.length) {
+          closestEnd.push(arr)
+        }
+        else if (arr[1] < closestEnd[0][1]) {
+          closestEnd.pop()
+          closestEnd.push(arr)
+        }
+      })
+      console.log(distances, closest, distanceEnd, closestEnd)
+      // display data
     }
     
   }, [originalRoute])
   
-  // select TFL routes on route
-  // buffer them
-  // find where intersects
-  // filter intersects by which one's actually used
-  // display data
+
 
   // research directions from markers
   // set reduced directions

@@ -9,11 +9,13 @@ const App = () => {
   
   // STATE
   const [originalRoute, setOriginalRoute] = useState('')
+  const [startPoint, setStartPoint] = useState([])
+  const [endPoint, setEndPoint] = useState([])
 
   return (
     <>
-      <Search setOriginalRoute={setOriginalRoute}/>
-      <Map originalRoute={originalRoute}/>
+      <Search setOriginalRoute={setOriginalRoute} setStartPoint={setStartPoint} setEndPoint={setEndPoint}/>
+      <Map originalRoute={originalRoute} startPoint={startPoint} endPoint={endPoint}/>
       <Directions />
     </>
   )
