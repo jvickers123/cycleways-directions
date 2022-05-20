@@ -60,7 +60,7 @@ const Map = ({ originalRoute, startPoint, endPoint }) => {
 
       // filter intersects by which one's actually used
       const distances = []
-      filteredIntersects.forEach(item => item[1].features.forEach(feature => distances.push([item[0], distance(startPoint, feature.geometry.coordinates)])))
+      filteredIntersects.forEach(item => item[1].features.forEach(feature => distances.push([item[0], distance(startPoint, feature.geometry.coordinates), distance(endPoint, feature.geometry.coordinates), feature])))
       const closest = []
       distances.forEach(arr => {
         if (!closest.length) {
@@ -76,9 +76,10 @@ const Map = ({ originalRoute, startPoint, endPoint }) => {
           }
         }
       })
+      closest.sort((a, b) => a[1] - b[1])
       const closestEnd = []
       const distanceEnd = []
-      filteredIntersects.forEach(item => item[1].features.forEach(feature => distanceEnd.push([item[0], distance(endPoint, feature.geometry.coordinates)])))
+      filteredIntersects.forEach(item => item[1].features.forEach(feature => distanceEnd.push([item[0], distance(endPoint, feature.geometry.coordinates), feature])))
       distanceEnd.forEach(arr => {
         if (!closestEnd.length) {
           closestEnd.push(arr)
@@ -93,8 +94,31 @@ const Map = ({ originalRoute, startPoint, endPoint }) => {
           }
         }
       })
+      closestEnd.sort((a, b) => b[1] - a[1])
+
       console.log(distances, closest, distanceEnd, closestEnd)
+      // removes unnessecary intersects (need to check this one)
+      closest.forEach((item, startInd) => {
+        const sameLineEndInd = closestEnd.findIndex(arr => arr[0] === item[0])
+        closestEnd.forEach((arr, i) => {
+          if (i >= startInd && i < sameLineEndInd) {
+            const startIndex = closest.findIndex(item => item[0] === arr[0])
+            closest.splice(startIndex, 1)
+          }
+        })
+      })
+
+      const filteredEndPoints = closestEnd.filter(item => closest.findIndex(arr => arr[0] === item[0]) !== -1)
+      console.log(filteredEndPoints, closest)
+      // check the equivalent distance to end
+      // remove all that are behind 
+      // find next closest in closest array
+      // check next distance to end
+      // if no more closest then finsish
+      
+      
       // display data
+
     }
     
   }, [originalRoute])
