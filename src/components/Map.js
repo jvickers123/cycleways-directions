@@ -121,11 +121,11 @@ const Map = ({ originalRoute, startPoint, endPoint }) => {
 
     }
     
-  }, [originalRoute])
+  }, [originalRoute, startPoint, endPoint])
   
 
 
-  // research directions from markers
+  // re-search directions from markers
   // set reduced directions
 
 
